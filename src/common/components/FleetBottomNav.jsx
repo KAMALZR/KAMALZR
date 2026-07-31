@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Paper, BottomNavigation, BottomNavigationAction, Badge } from '@mui/material';
@@ -5,6 +6,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import RouteIcon from '@mui/icons-material/Route';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AppsIcon from '@mui/icons-material/Apps';
+import MoreMenu from './MoreMenu';
 
 const FleetBottomNav = () => {
   const navigate = useNavigate();
@@ -12,7 +15,12 @@ const FleetBottomNav = () => {
 
   const eventsCount = useSelector((state) => state.events.items.length);
 
+  const [moreOpen, setMoreOpen] = useState(false);
+
   const currentSelection = () => {
+    if (moreOpen) {
+      return 'more';
+    }
     if (location.pathname.startsWith('/reports/events')) {
       return 'alerts';
     }
@@ -41,6 +49,9 @@ const FleetBottomNav = () => {
         break;
       case 'settings':
         navigate('/settings/preferences');
+        break;
+      case 'more':
+        setMoreOpen(true);
         break;
       default:
         break;
@@ -73,7 +84,9 @@ const FleetBottomNav = () => {
           value="alerts"
         />
         <BottomNavigationAction label="Réglages" icon={<SettingsIcon />} value="settings" />
+        <BottomNavigationAction label="Plus" icon={<AppsIcon />} value="more" />
       </BottomNavigation>
+      <MoreMenu open={moreOpen} onClose={() => setMoreOpen(false)} />
     </Paper>
   );
 };
