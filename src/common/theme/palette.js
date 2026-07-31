@@ -1,6 +1,9 @@
-import { grey, green, indigo } from '@mui/material/colors';
+import { grey, green } from '@mui/material/colors';
 
 const validatedColor = (color) => (/^#([0-9A-Fa-f]{3}){1,2}$/.test(color) ? color : null);
+
+// FleetTrack brand blue
+const fleetPrimary = { light: '#1f6feb', dark: '#7aa8ff' };
 
 export default (server, darkMode) => ({
   mode: darkMode ? 'dark' : 'light',
@@ -9,7 +12,8 @@ export default (server, darkMode) => ({
   },
   primary: {
     main:
-      validatedColor(server?.attributes?.colorPrimary) || (darkMode ? indigo[200] : indigo[900]),
+      validatedColor(server?.attributes?.colorPrimary) ||
+      (darkMode ? fleetPrimary.dark : fleetPrimary.light),
   },
   secondary: {
     main:

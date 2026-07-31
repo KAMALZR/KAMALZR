@@ -1,50 +1,64 @@
-import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import { Paper } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
 import DeviceList from './DeviceList';
-import BottomMenu from '../common/components/BottomMenu';
-import StatusCard from '../common/components/StatusCard';
+import TopMenu from '../common/components/TopMenu';
+import FleetToolbar from './FleetToolbar';
+import FleetStatusCard from '../common/components/FleetStatusCard';
 import { devicesActions } from '../store';
 import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
 import { useAttributePreference } from '../common/util/preferences';
+import { getFleetCategory } from '../common/util/fleet';
 
 const MainMap = lazy(() => import('./MainMap'));
 
 const useStyles = makeStyles()((theme) => ({
   root: {
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
+  content: {
+    flex: 1,
+    position: 'relative',
+    minHeight: 0,
+    display: 'flex',
+  },
+  leftPanel: {
+    width: theme.dimensions.drawerWidthDesktop,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    backgroundColor: theme.palette.background.paper,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    zIndex: 4,
+  },
+  deviceListWrap: {
+    flex: 1,
+    minHeight: 0,
+  },
+  mapWrap: {
+    flex: 1,
+    position: 'relative',
+    minHeight: 0,
+  },
+  // Mobile layout (unchanged Traccar behaviour)
   sidebar: {
     pointerEvents: 'none',
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      height: `calc(100% - ${theme.spacing(3)})`,
-      width: theme.dimensions.drawerWidthDesktop,
-      margin: theme.spacing(1.5),
-      zIndex: 3,
-    },
-    [theme.breakpoints.down('md')]: {
-      height: '100%',
-      width: '100%',
-    },
+    height: '100%',
+    width: '100%',
   },
   header: {
     pointerEvents: 'auto',
     zIndex: 6,
-  },
-  footer: {
-    pointerEvents: 'auto',
-    zIndex: 5,
   },
   middle: {
     flex: 1,
@@ -83,6 +97,7 @@ const MainPage = () => {
   const [filteredDevices, setFilteredDevices] = useState([]);
 
   const [keyword, setKeyword] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState(null);
   const [filter, setFilter] = usePersistedState('deviceFilter', {
     statuses: [],
     groups: [],
@@ -112,17 +127,59 @@ const MainPage = () => {
     setFilteredPositions,
   );
 
+  const displayedDevices = useMemo(() => {
+    if (!categoryFilter) {
+      return filteredDevices;
+    }
+    return filteredDevices.filter(
+      (device) => getFleetCategory(device, positions[device.id]) === categoryFilter,
+    );
+  }, [filteredDevices, categoryFilter, positions]);
+
+  const statusCard = selectedDeviceId && (
+    <FleetStatusCard
+      deviceId={selectedDeviceId}
+      position={selectedPosition}
+      onClose={() => dispatch(devicesActions.selectId(null))}
+      desktopPadding={theme.dimensions.drawerWidthDesktop}
+    />
+  );
+
+  if (desktop) {
+    return (
+      <div className={classes.root}>
+        <TopMenu onAlertsClick={onEventsClick} />
+        <div className={classes.content}>
+          <div className={classes.leftPanel}>
+            <FleetToolbar
+              keyword={keyword}
+              setKeyword={setKeyword}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+            />
+            <div className={classes.deviceListWrap}>
+              <DeviceList devices={displayedDevices} />
+            </div>
+          </div>
+          <div className={classes.mapWrap}>
+            <Suspense fallback={null}>
+              <MainMap
+                filteredPositions={filteredPositions}
+                selectedPosition={selectedPosition}
+                onEventsClick={onEventsClick}
+                disablePadding
+              />
+            </Suspense>
+          </div>
+        </div>
+        <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
+        {statusCard}
+      </div>
+    );
+  }
+
   return (
     <div className={classes.root}>
-      {desktop && (
-        <Suspense fallback={null}>
-          <MainMap
-            filteredPositions={filteredPositions}
-            selectedPosition={selectedPosition}
-            onEventsClick={onEventsClick}
-          />
-        </Suspense>
-      )}
       <div className={classes.sidebar}>
         <Paper square elevation={3} className={classes.header}>
           <MainToolbar
@@ -140,17 +197,15 @@ const MainPage = () => {
           />
         </Paper>
         <div className={classes.middle}>
-          {!desktop && (
-            <div className={classes.contentMap}>
-              <Suspense fallback={null}>
-                <MainMap
-                  filteredPositions={filteredPositions}
-                  selectedPosition={selectedPosition}
-                  onEventsClick={onEventsClick}
-                />
-              </Suspense>
-            </div>
-          )}
+          <div className={classes.contentMap}>
+            <Suspense fallback={null}>
+              <MainMap
+                filteredPositions={filteredPositions}
+                selectedPosition={selectedPosition}
+                onEventsClick={onEventsClick}
+              />
+            </Suspense>
+          </div>
           <Paper
             square
             className={classes.contentList}
@@ -159,21 +214,9 @@ const MainPage = () => {
             <DeviceList devices={filteredDevices} />
           </Paper>
         </div>
-        {desktop && (
-          <div className={classes.footer}>
-            <BottomMenu />
-          </div>
-        )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-      {selectedDeviceId && (
-        <StatusCard
-          deviceId={selectedDeviceId}
-          position={selectedPosition}
-          onClose={() => dispatch(devicesActions.selectId(null))}
-          desktopPadding={theme.dimensions.drawerWidthDesktop}
-        />
-      )}
+      {statusCard}
     </div>
   );
 };

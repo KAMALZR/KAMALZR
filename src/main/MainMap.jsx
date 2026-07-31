@@ -20,7 +20,7 @@ import MapRuler from '../map/control/MapRuler';
 import MapNotification from '../map/control/MapNotification';
 import useFeatures from '../common/util/useFeatures';
 
-const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
+const MainMap = ({ filteredPositions, selectedPosition, onEventsClick, disablePadding }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -64,7 +64,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       <MapScale />
       <MapCurrentLocation />
       <MapGeocoder />
-      {desktop && (
+      {desktop && !disablePadding && (
         <MapPadding
           start={
             parseInt(theme.dimensions.drawerWidthDesktop, 10) + parseInt(theme.spacing(1.5), 10)
