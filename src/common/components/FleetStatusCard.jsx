@@ -1,8 +1,18 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, Typography, IconButton, Button, LinearProgress } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Button,
+  LinearProgress,
+  Tooltip,
+} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -171,6 +181,8 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const deviceReadonly = useDeviceReadonly();
 
@@ -226,25 +238,51 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
                 )}
               </div>
               <div className={classes.actions}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<EditIcon />}
-                  onClick={() => navigate(`/settings/device/${deviceId}`)}
-                  disabled={deviceReadonly}
-                >
-                  Modifier
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="small"
-                  startIcon={<DeleteIcon />}
-                  onClick={() => setRemoving(true)}
-                  disabled={deviceReadonly}
-                >
-                  Supprimer
-                </Button>
+                {desktop ? (
+                  <>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => navigate(`/settings/device/${deviceId}`)}
+                      disabled={deviceReadonly}
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => setRemoving(true)}
+                      disabled={deviceReadonly}
+                    >
+                      Supprimer
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Tooltip title="Modifier">
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate(`/settings/device/${deviceId}`)}
+                        disabled={deviceReadonly}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Supprimer">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => setRemoving(true)}
+                        disabled={deviceReadonly}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
                 <IconButton size="small" onClick={onClose}>
                   <CloseIcon fontSize="small" />
                 </IconButton>
