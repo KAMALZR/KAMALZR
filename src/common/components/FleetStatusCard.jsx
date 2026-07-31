@@ -19,6 +19,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlaceIcon from '@mui/icons-material/Place';
 import PersonIcon from '@mui/icons-material/Person';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import SpeedIcon from '@mui/icons-material/Speed';
+import StraightenIcon from '@mui/icons-material/Straighten';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -122,6 +126,15 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     borderRadius: 10,
     padding: theme.spacing(1),
   },
+  tileHead: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.5),
+    color: theme.palette.text.secondary,
+  },
+  tileIcon: {
+    fontSize: '0.95rem',
+  },
   tileLabel: {
     color: theme.palette.text.secondary,
     fontSize: '0.7rem',
@@ -160,11 +173,14 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   },
 }));
 
-const Tile = ({ label, value, percent, color }) => {
+const Tile = ({ label, value, percent, color, icon: Icon }) => {
   const { classes } = useStyles({ desktopPadding: 0 });
   return (
     <div className={classes.tile}>
-      <Typography className={classes.tileLabel}>{label}</Typography>
+      <div className={classes.tileHead}>
+        {Icon && <Icon className={classes.tileIcon} />}
+        <Typography className={classes.tileLabel}>{label}</Typography>
+      </div>
       <Typography className={classes.tileValue}>{value}</Typography>
       {percent != null && (
         <LinearProgress
@@ -298,6 +314,7 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
               <div className={classes.tiles}>
                 <Tile
                   label="Vitesse"
+                  icon={SpeedIcon}
                   value={
                     position != null
                       ? `${Math.round(speedFromKnots(position.speed, speedUnit))} ${speedUnitString(speedUnit, t)}`
@@ -306,6 +323,7 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
                 />
                 <Tile
                   label="Aujourd'hui"
+                  icon={StraightenIcon}
                   value={
                     totalDistance != null
                       ? `${Math.round(distanceFromMeters(totalDistance, distanceUnit))} ${distanceUnitString(distanceUnit, t)}`
@@ -314,12 +332,14 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
                 />
                 <Tile
                   label="Carburant"
+                  icon={LocalGasStationIcon}
                   value={fuel != null ? `${Math.round(fuel)} %` : '—'}
                   percent={fuel != null ? fuel : null}
                   color="#f59e0b"
                 />
                 <Tile
                   label="Batterie"
+                  icon={BatteryFullIcon}
                   value={battery != null ? `${Math.round(battery)} %` : '—'}
                   percent={battery != null ? battery : null}
                   color="#16a34a"

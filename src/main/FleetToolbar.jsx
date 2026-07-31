@@ -20,26 +20,29 @@ const useStyles = makeStyles()((theme) => ({
     fontWeight: 600,
   },
   chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
     gap: theme.spacing(1),
   },
   chip: {
-    flex: '1 1 45%',
     display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(0.75),
-    padding: theme.spacing(0.75, 1.25),
-    borderRadius: 10,
+    flexDirection: 'column',
+    gap: theme.spacing(0.5),
+    padding: theme.spacing(1, 1.25),
+    borderRadius: 12,
     border: `1px solid ${theme.palette.divider}`,
     backgroundColor: theme.palette.background.paper,
     cursor: 'pointer',
-    fontSize: '0.8rem',
     userSelect: 'none',
     transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow']),
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
     },
+  },
+  chipTop: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.75),
   },
   dot: {
     width: 9,
@@ -48,20 +51,14 @@ const useStyles = makeStyles()((theme) => ({
     flexShrink: 0,
   },
   chipLabel: {
-    flexGrow: 1,
     color: theme.palette.text.secondary,
     whiteSpace: 'nowrap',
+    fontSize: '0.75rem',
   },
   chipCount: {
     fontWeight: 700,
-    minWidth: 22,
-    height: 20,
-    padding: theme.spacing(0, 0.75),
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 999,
-    fontSize: '0.72rem',
+    fontSize: '1.35rem',
+    lineHeight: 1,
   },
 }));
 
@@ -106,6 +103,7 @@ const FleetToolbar = ({ keyword, setKeyword, categoryFilter, setCategoryFilter }
         }
         size="small"
         fullWidth
+        sx={{ borderRadius: 2.5 }}
       />
       <div className={classes.chips}>
         {fleetCategories.map((category) => {
@@ -121,17 +119,16 @@ const FleetToolbar = ({ keyword, setKeyword, categoryFilter, setCategoryFilter }
               }
               onClick={() => setCategoryFilter(active ? null : category.key)}
             >
-              <span className={classes.dot} style={{ backgroundColor: category.color }} />
-              <span
-                className={classes.chipLabel}
-                style={active ? { color: category.color, fontWeight: 600 } : undefined}
-              >
-                {category.label}
-              </span>
-              <span
-                className={classes.chipCount}
-                style={{ color: category.color, backgroundColor: `${category.color}1f` }}
-              >
+              <div className={classes.chipTop}>
+                <span className={classes.dot} style={{ backgroundColor: category.color }} />
+                <span
+                  className={classes.chipLabel}
+                  style={active ? { color: category.color, fontWeight: 600 } : undefined}
+                >
+                  {category.label}
+                </span>
+              </div>
+              <span className={classes.chipCount} style={{ color: category.color }}>
                 {counts[category.key]}
               </span>
             </div>

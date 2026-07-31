@@ -1,8 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
-import { ListItemButton, ListItemText, Typography, Box } from '@mui/material';
+import { ListItemButton, ListItemText, Typography, Box, Avatar } from '@mui/material';
 import SpeedIcon from '@mui/icons-material/Speed';
 import PlaceIcon from '@mui/icons-material/Place';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
+import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
+import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { devicesActions } from '../store';
@@ -15,7 +21,34 @@ import { getFleetCategory, fleetCategory } from '../common/util/fleet';
 
 dayjs.extend(relativeTime);
 
+const categoryIcon = (category) => {
+  switch (category) {
+    case 'truck':
+    case 'tractor':
+    case 'pickup':
+    case 'crane':
+      return <LocalShippingIcon fontSize="small" />;
+    case 'bus':
+      return <DirectionsBusIcon fontSize="small" />;
+    case 'motorcycle':
+    case 'scooter':
+    case 'bicycle':
+      return <TwoWheelerIcon fontSize="small" />;
+    case 'boat':
+    case 'ship':
+      return <DirectionsBoatIcon fontSize="small" />;
+    case 'person':
+      return <DirectionsWalkIcon fontSize="small" />;
+    default:
+      return <DirectionsCarIcon fontSize="small" />;
+  }
+};
+
 const useStyles = makeStyles()((theme) => ({
+  avatar: {
+    width: 38,
+    height: 38,
+  },
   button: {
     gap: theme.spacing(1.5),
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -29,12 +62,6 @@ const useStyles = makeStyles()((theme) => ({
     '&:hover': {
       backgroundColor: `${theme.palette.primary.main}1f`,
     },
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: '50%',
-    flexShrink: 0,
   },
   row: {
     display: 'flex',
@@ -83,6 +110,7 @@ const DeviceRow = ({ devices, index, style }) => {
   const speedUnit = useAttributePreference('speedUnit', 'kmh');
 
   const category = fleetCategory(getFleetCategory(item, position));
+  const categoryElement = categoryIcon(item.category);
 
   const speedText =
     position != null
@@ -102,7 +130,12 @@ const DeviceRow = ({ devices, index, style }) => {
           selectedDeviceId === item.id ? `${classes.button} ${classes.selected}` : classes.button
         }
       >
-        <span className={classes.statusDot} style={{ backgroundColor: category.color }} />
+        <Avatar
+          className={classes.avatar}
+          style={{ backgroundColor: `${category.color}1f`, color: category.color }}
+        >
+          {categoryElement}
+        </Avatar>
         <ListItemText
           disableTypography
           primary={
