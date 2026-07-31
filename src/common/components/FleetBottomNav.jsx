@@ -49,8 +49,19 @@ const FleetBottomNav = () => {
 
   return (
     <Paper square elevation={3}>
-      <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
-        <BottomNavigationAction label="Tableau de bord" icon={<DashboardIcon />} value="map" />
+      <BottomNavigation
+        value={currentSelection()}
+        onChange={handleSelection}
+        showLabels
+        sx={{
+          height: 56,
+          '& .MuiBottomNavigationAction-label': {
+            whiteSpace: 'nowrap',
+            fontSize: '0.7rem',
+          },
+        }}
+      >
+        <BottomNavigationAction label="Accueil" icon={<DashboardIcon />} value="map" />
         <BottomNavigationAction label="Trajets" icon={<RouteIcon />} value="reports" />
         <BottomNavigationAction
           label="Alertes"
