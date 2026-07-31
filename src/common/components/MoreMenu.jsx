@@ -1,68 +1,71 @@
 import { useNavigate } from 'react-router-dom';
-import { Drawer, Box, Typography, IconButton } from '@mui/material';
+import { Drawer, Typography, IconButton } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import CloseIcon from '@mui/icons-material/Close';
-import DrawIcon from '@mui/icons-material/Draw';
-import PersonIcon from '@mui/icons-material/Person';
-import FolderIcon from '@mui/icons-material/Folder';
-import BuildIcon from '@mui/icons-material/Build';
-import SendIcon from '@mui/icons-material/Send';
-import TodayIcon from '@mui/icons-material/Today';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import DescriptionIcon from '@mui/icons-material/Description';
+import WorkspacesOutlinedIcon from '@mui/icons-material/WorkspacesOutlined';
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
+import MovieOutlinedIcon from '@mui/icons-material/MovieOutlined';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import FunctionsOutlinedIcon from '@mui/icons-material/FunctionsOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 const useStyles = makeStyles()((theme) => ({
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: theme.spacing(1.5, 2, 0.5, 2),
+    padding: theme.spacing(2, 2, 1, 2),
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: theme.spacing(1),
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: theme.spacing(1.5),
     padding: theme.spacing(1, 2, 3, 2),
   },
   item: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: theme.spacing(0.5),
-    padding: theme.spacing(1, 0.5),
+    justifyContent: 'center',
+    gap: theme.spacing(1),
+    padding: theme.spacing(2, 1),
+    minHeight: 96,
+    border: `1px solid ${theme.palette.divider}`,
     borderRadius: 12,
     cursor: 'pointer',
     textAlign: 'center',
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.background.paper,
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
     },
   },
-  iconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.palette.action.selected,
-    color: theme.palette.primary.main,
+  icon: {
+    fontSize: 28,
   },
   label: {
-    fontSize: '0.72rem',
-    lineHeight: 1.1,
-    color: theme.palette.text.secondary,
+    fontSize: '0.82rem',
+    lineHeight: 1.15,
   },
 }));
 
 const items = [
-  { label: 'Géofences', icon: <DrawIcon />, to: '/geofences' },
-  { label: 'Conducteurs', icon: <PersonIcon />, to: '/settings/drivers' },
-  { label: 'Groupes', icon: <FolderIcon />, to: '/settings/groups' },
-  { label: 'Maintenance', icon: <BuildIcon />, to: '/settings/maintenances' },
-  { label: 'Commandes', icon: <SendIcon />, to: '/settings/commands' },
-  { label: 'Calendriers', icon: <TodayIcon />, to: '/settings/calendars' },
-  { label: 'Notifications', icon: <NotificationsIcon />, to: '/settings/notifications' },
-  { label: 'Rapports', icon: <DescriptionIcon />, to: '/reports/summary' },
+  { label: 'Groupes', icon: WorkspacesOutlinedIcon, to: '/settings/groups' },
+  { label: 'Zones', icon: CategoryOutlinedIcon, to: '/geofences' },
+  { label: 'Rejeu', icon: MovieOutlinedIcon, to: '/replay' },
+  { label: 'Rapports', icon: BarChartOutlinedIcon, to: '/reports/combined' },
+  { label: 'Conducteurs', icon: PersonOutlineOutlinedIcon, to: '/settings/drivers' },
+  { label: 'Entretien', icon: BuildOutlinedIcon, to: '/settings/maintenances' },
+  { label: 'Commandes', icon: SensorsOutlinedIcon, to: '/settings/commands' },
+  { label: 'Notifications', icon: NotificationsNoneOutlinedIcon, to: '/settings/notifications' },
+  { label: 'Calendriers', icon: CalendarMonthOutlinedIcon, to: '/settings/calendars' },
+  { label: 'Attributs calculés', icon: FunctionsOutlinedIcon, to: '/settings/attributes' },
+  { label: 'Réglages', icon: SettingsOutlinedIcon, to: '/settings/preferences' },
 ];
 
 const MoreMenu = ({ open, onClose }) => {
@@ -82,21 +85,21 @@ const MoreMenu = ({ open, onClose }) => {
       slotProps={{ paper: { sx: { borderTopLeftRadius: 16, borderTopRightRadius: 16 } } }}
     >
       <div className={classes.header}>
-        <Typography variant="subtitle1" fontWeight={700}>
-          Plus
+        <Typography variant="h6" fontWeight={700}>
+          Plus d&apos;options
         </Typography>
         <IconButton size="small" onClick={onClose}>
-          <CloseIcon fontSize="small" />
+          <CloseIcon />
         </IconButton>
       </div>
-      <Box className={classes.grid}>
-        {items.map((item) => (
-          <div key={item.label} className={classes.item} onClick={() => handleClick(item.to)}>
-            <div className={classes.iconBox}>{item.icon}</div>
-            <span className={classes.label}>{item.label}</span>
+      <div className={classes.grid}>
+        {items.map(({ label, icon: Icon, to }) => (
+          <div key={label} className={classes.item} onClick={() => handleClick(to)}>
+            <Icon className={classes.icon} />
+            <span className={classes.label}>{label}</span>
           </div>
         ))}
-      </Box>
+      </div>
     </Drawer>
   );
 };
