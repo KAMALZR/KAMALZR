@@ -9,10 +9,8 @@ import TopMenu from '../common/components/TopMenu';
 import FleetToolbar from './FleetToolbar';
 import FleetStatusCard from '../common/components/FleetStatusCard';
 import { devicesActions } from '../store';
-import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
-import MainToolbar from './MainToolbar';
 import { useAttributePreference } from '../common/util/preferences';
 import { getFleetCategory } from '../common/util/fleet';
 
@@ -48,33 +46,15 @@ const useStyles = makeStyles()((theme) => ({
     position: 'relative',
     minHeight: 0,
   },
-  // Mobile layout (unchanged Traccar behaviour)
-  sidebar: {
-    pointerEvents: 'none',
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    width: '100%',
-  },
-  header: {
-    pointerEvents: 'auto',
-    zIndex: 6,
-  },
-  middle: {
-    flex: 1,
-    display: 'grid',
-    minHeight: 0,
-  },
-  contentMap: {
-    pointerEvents: 'auto',
-    gridArea: '1 / 1',
-  },
-  contentList: {
-    pointerEvents: 'auto',
-    gridArea: '1 / 1',
+  // Mobile: full-screen vehicle panel overlaying the map
+  mobileList: {
+    position: 'absolute',
+    inset: 0,
     zIndex: 4,
     display: 'flex',
+    flexDirection: 'column',
     minHeight: 0,
+    backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -98,15 +78,11 @@ const MainPage = () => {
 
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(null);
-  const [filter, setFilter] = usePersistedState('deviceFilter', {
-    statuses: [],
-    groups: [],
-    geofences: [],
-  });
-  const [filterSort, setFilterSort] = usePersistedState('filterSort', '');
-  const [filterMap, setFilterMap] = usePersistedState('filterMap', false);
+  const filter = { statuses: [], groups: [], geofences: [] };
+  const filterSort = '';
+  const filterMap = false;
 
-  const [devicesOpen, setDevicesOpen] = useState(desktop);
+  const [devicesOpen, setDevicesOpen] = useState(true);
   const [eventsOpen, setEventsOpen] = useState(false);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
@@ -180,40 +156,34 @@ const MainPage = () => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.sidebar}>
-        <Paper square elevation={3} className={classes.header}>
-          <MainToolbar
-            filteredDevices={filteredDevices}
-            devicesOpen={devicesOpen}
-            setDevicesOpen={setDevicesOpen}
-            keyword={keyword}
-            setKeyword={setKeyword}
-            filter={filter}
-            setFilter={setFilter}
-            filterSort={filterSort}
-            setFilterSort={setFilterSort}
-            filterMap={filterMap}
-            setFilterMap={setFilterMap}
-          />
-        </Paper>
-        <div className={classes.middle}>
-          <div className={classes.contentMap}>
-            <Suspense fallback={null}>
-              <MainMap
-                filteredPositions={filteredPositions}
-                selectedPosition={selectedPosition}
-                onEventsClick={onEventsClick}
-              />
-            </Suspense>
-          </div>
-          <Paper
-            square
-            className={classes.contentList}
-            style={devicesOpen ? {} : { visibility: 'hidden' }}
-          >
-            <DeviceList devices={filteredDevices} />
-          </Paper>
+      <TopMenu
+        onAlertsClick={onEventsClick}
+        onToggleList={() => setDevicesOpen((open) => !open)}
+        listOpen={devicesOpen}
+      />
+      <div className={classes.content}>
+        <div className={classes.mapWrap}>
+          <Suspense fallback={null}>
+            <MainMap
+              filteredPositions={filteredPositions}
+              selectedPosition={selectedPosition}
+              onEventsClick={onEventsClick}
+            />
+          </Suspense>
         </div>
+        {devicesOpen && (
+          <Paper square elevation={0} className={classes.mobileList}>
+            <FleetToolbar
+              keyword={keyword}
+              setKeyword={setKeyword}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+            />
+            <div className={classes.deviceListWrap}>
+              <DeviceList devices={displayedDevices} />
+            </div>
+          </Paper>
+        )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
       {statusCard}

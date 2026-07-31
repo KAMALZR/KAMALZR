@@ -15,11 +15,15 @@ import {
   Tooltip,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import RouteIcon from '@mui/icons-material/Route';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NavigationIcon from '@mui/icons-material/Navigation';
+import MapIcon from '@mui/icons-material/Map';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 import { sessionActions } from '../../store';
 import { nativePostMessage } from './NativeInterface';
@@ -76,8 +80,10 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
-const TopMenu = ({ onAlertsClick }) => {
+const TopMenu = ({ onAlertsClick, onToggleList, listOpen }) => {
   const { classes, cx } = useStyles();
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -115,6 +121,11 @@ const TopMenu = ({ onAlertsClick }) => {
   return (
     <AppBar position="static" elevation={0} className={classes.appBar}>
       <Toolbar className={classes.toolbar}>
+        {!desktop && onToggleList && (
+          <IconButton edge="start" onClick={onToggleList}>
+            {listOpen ? <MapIcon /> : <ListAltIcon />}
+          </IconButton>
+        )}
         <div className={classes.brand}>
           <div className={classes.brandIcon}>
             <NavigationIcon fontSize="small" />
@@ -123,36 +134,38 @@ const TopMenu = ({ onAlertsClick }) => {
             FleetTrack
           </Typography>
         </div>
-        <Box className={classes.nav}>
-          <Button
-            className={cx(classes.navButton, isMap && classes.navButtonActive)}
-            startIcon={<DashboardIcon />}
-            onClick={() => navigate('/')}
-          >
-            Tableau de bord
-          </Button>
-          <Button
-            className={cx(classes.navButton, isReports && classes.navButtonActive)}
-            startIcon={<RouteIcon />}
-            onClick={() => navigate('/reports/combined')}
-          >
-            Trajets
-          </Button>
-          <Button
-            className={classes.navButton}
-            startIcon={<NotificationsIcon />}
-            onClick={handleAlerts}
-          >
-            Alertes
-          </Button>
-          <Button
-            className={cx(classes.navButton, isSettings && classes.navButtonActive)}
-            startIcon={<SettingsIcon />}
-            onClick={() => navigate('/settings/preferences')}
-          >
-            Réglages
-          </Button>
-        </Box>
+        {desktop && (
+          <Box className={classes.nav}>
+            <Button
+              className={cx(classes.navButton, isMap && classes.navButtonActive)}
+              startIcon={<DashboardIcon />}
+              onClick={() => navigate('/')}
+            >
+              Tableau de bord
+            </Button>
+            <Button
+              className={cx(classes.navButton, isReports && classes.navButtonActive)}
+              startIcon={<RouteIcon />}
+              onClick={() => navigate('/reports/combined')}
+            >
+              Trajets
+            </Button>
+            <Button
+              className={classes.navButton}
+              startIcon={<NotificationsIcon />}
+              onClick={handleAlerts}
+            >
+              Alertes
+            </Button>
+            <Button
+              className={cx(classes.navButton, isSettings && classes.navButtonActive)}
+              startIcon={<SettingsIcon />}
+              onClick={() => navigate('/settings/preferences')}
+            >
+              Réglages
+            </Button>
+          </Box>
+        )}
         <div className={classes.spacer} />
         <Tooltip title="Alertes">
           <IconButton onClick={handleAlerts}>
