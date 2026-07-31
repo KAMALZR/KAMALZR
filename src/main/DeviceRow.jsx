@@ -16,14 +16,32 @@ import { getFleetCategory, fleetCategory } from '../common/util/fleet';
 dayjs.extend(relativeTime);
 
 const useStyles = makeStyles()((theme) => ({
+  button: {
+    gap: theme.spacing(1.5),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    borderLeft: '3px solid transparent',
+    paddingTop: theme.spacing(1.25),
+    paddingBottom: theme.spacing(1.25),
+  },
   selected: {
-    backgroundColor: theme.palette.action.selected,
+    backgroundColor: `${theme.palette.primary.main}14`,
+    borderLeftColor: theme.palette.primary.main,
+    '&:hover': {
+      backgroundColor: `${theme.palette.primary.main}1f`,
+    },
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    flexShrink: 0,
   },
   row: {
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(0.25),
+    gap: theme.spacing(0.5),
     minWidth: 0,
+    flexGrow: 1,
   },
   topLine: {
     display: 'flex',
@@ -31,10 +49,12 @@ const useStyles = makeStyles()((theme) => ({
     justifyContent: 'space-between',
     gap: theme.spacing(1),
   },
-  status: {
+  statusPill: {
     fontWeight: 600,
-    fontSize: '0.75rem',
+    fontSize: '0.68rem',
     flexShrink: 0,
+    padding: theme.spacing(0.25, 1),
+    borderRadius: 999,
   },
   meta: {
     display: 'flex',
@@ -78,8 +98,11 @@ const DeviceRow = ({ devices, index, style }) => {
         onClick={() => dispatch(devicesActions.selectId(item.id))}
         disabled={!admin && item.disabled}
         selected={selectedDeviceId === item.id}
-        className={selectedDeviceId === item.id ? classes.selected : null}
+        className={
+          selectedDeviceId === item.id ? `${classes.button} ${classes.selected}` : classes.button
+        }
       >
+        <span className={classes.statusDot} style={{ backgroundColor: category.color }} />
         <ListItemText
           disableTypography
           primary={
@@ -88,7 +111,10 @@ const DeviceRow = ({ devices, index, style }) => {
                 <Typography variant="body2" fontWeight={600} noWrap>
                   {item.name}
                 </Typography>
-                <span className={classes.status} style={{ color: category.color }}>
+                <span
+                  className={classes.statusPill}
+                  style={{ color: category.color, backgroundColor: `${category.color}1f` }}
+                >
                   {category.label}
                 </span>
               </div>

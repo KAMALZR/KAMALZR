@@ -91,7 +91,9 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   },
   status: {
     fontWeight: 600,
-    fontSize: '0.8rem',
+    fontSize: '0.72rem',
+    padding: theme.spacing(0.25, 1),
+    borderRadius: 999,
   },
   actions: {
     display: 'flex',
@@ -227,7 +229,10 @@ const FleetStatusCard = ({ deviceId, position, onClose, desktopPadding = 0 }) =>
                   <Typography variant="subtitle1" fontWeight={700}>
                     {device.name}
                   </Typography>
-                  <span className={classes.status} style={{ color: category.color }}>
+                  <span
+                    className={classes.status}
+                    style={{ color: category.color, backgroundColor: `${category.color}1f` }}
+                  >
                     {category.label}
                   </span>
                 </div>

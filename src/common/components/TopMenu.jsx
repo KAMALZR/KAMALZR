@@ -33,6 +33,7 @@ const useStyles = makeStyles()((theme) => ({
     backgroundColor: theme.palette.background.paper,
     color: theme.palette.text.primary,
     borderBottom: `1px solid ${theme.palette.divider}`,
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
     zIndex: theme.zIndex.drawer + 2,
   },
   toolbar: {
