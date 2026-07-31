@@ -78,7 +78,7 @@ const MainPage = () => {
 
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState(null);
-  const filter = { statuses: [], groups: [], geofences: [] };
+  const filter = useMemo(() => ({ statuses: [], groups: [], geofences: [] }), []);
   const filterSort = '';
   const filterMap = false;
 
@@ -186,7 +186,7 @@ const MainPage = () => {
         )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-      {statusCard}
+      {!devicesOpen && statusCard}
     </div>
   );
 };
